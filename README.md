@@ -91,6 +91,8 @@ The following section corresponds to the global configuration for any network de
     |-------|-------|
     | <pre><code>crypto key generate rsa <br>yes<br>&lt;516 / 1024 / 2048&gt;</code></pre> | <pre><code>crypto key generate rsa mod &lt;516 / 1024 / 2048&gt;</code></pre> |
 
+<br>
+
 ## 12. Console Access Control
 
   12.1 Access to the line console configuration.
@@ -136,6 +138,7 @@ line console 0
   logging synchronous
 
 ```
+<br>
 
 ## 13. Virtual Console Configuration for Remote Access
 
@@ -191,12 +194,16 @@ line vty 0 2
   login local
   logging synchronouss
 ```
+---
+<br>
 
 14. Activate password encryption in the device
 
 ```
 service password-encryption 
 ```
+
+<br>
 
 ## Summary
 
@@ -263,6 +270,9 @@ service password-encryption
 
 ```
 
+<br>
+<br>
+<br>
 
 # Router Configuration
 
@@ -279,6 +289,7 @@ interface <port_name as G0/1>
   no shutdown
 
 ```
+<br>
 
 ### Serial ports  - Device Communication Equipment
 This specific configuration which only adds the command <code>clock rate</code> is only established in the DCE sides of a serial connection which is the speed of communication through the DCE and the DCT (Device Communication Terminal).
@@ -291,6 +302,7 @@ interface <serial_port_name as S0/0/0>
   no shutdown
 
 ```
+<br>
 
 ### Subinterfaces Configuration
 
@@ -313,10 +325,112 @@ Once all the subinterfaces of a physical interface or port have been declared, t
 interface <physical_port>
     no shutdown
 ```
+<br>
+
+## DCHP Configuration
+
+DHCP (Dynamic Host Configuration Procol) is the network porotocol that automaticallt assigns IP configurations to devices on a network.
+
+This simplifies and allows to skip over a direct IP address configuration.
+
+Any IP address that forms part of a network with DHCP and wants to be reserved or is in use must be exlcuded from it, including *always the default gateway*.
+
+The excluded addresses can be either a range or a singular address.
+
+```
+ip dhcp excluded-address <first_ip | Start of an IP range> <End of an IP range>
+
+ip dhcp pool <pool_name>
+  network <IP_network> <MSK>
+  default-router <IP_default_gateway_subinterface>
+  dns-server  <IP_dns_server>
+```
+<br>
+
+## Connection to ISP
+
+This configuration allows to redistirbute all network traffic going to the exterior passing it to more than one IPS.
+
+In case there is only one service providor:
+
+```
+ip route 0.0.0.0  0.0.0.0  <physical interface>
+```
+
+In case there are more than one service provider:
+
+Here the number is a priority, the lower the number, the higher the priority. When no number is given, it is declared as the highest 1.
+
+```
+ip route 0.0.0.0  0.0.0.0  <physical interface> <number>
+ip route 0.0.0.0  0.0.0.0  <physical interface> <number>
+```
+
+<br>
+<br>
+<br>
 
 # Switch Configuration
 
+Similarly to the router configuration, the switch configuration changes depending on the characteristics of the network. 
 
+## VLAN Configuration
+
+Generally the VLAN configuration in one switch is divided in the following steps:
+1. Creation of the VLAN database.
+2. Assign ports to the VLANs used in the given switch.
+3. Assign ports in TRUNK mode.
+4. Assign the Native VLAN and respective switch gateway.
+
+However, not always all these steps are used in all switches as some shurtcuts might be used as the central switch can collect the declaration of the VLANs and pass it to others through the VTP protocol. For this purpose, three configurations are shown, each for a different type of switch.
+
+<br>
+
+### Only Switch (All Steps)
+
+```
+vlan <VID>
+    name <name>
+    exit
+```
+
+```
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+    
+```
+
+```
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode trunk
+    no shutdown
+```
+
+```
+int vlan <native_VID>
+    description <description>
+    ip address <IP> <MSK>
+    no shutdown
+
+ip default-gateway <IP_gateway_subinterface>
+
+```
+
+<br>
+
+### Central Switch | Core Switch
+
+<br>
+
+### Secondary Switch 
+
+
+<br>
+<br>
+<br>
 
 # Troubleshooting and Monitoring Commands
 
@@ -326,8 +440,9 @@ interface <physical_port>
 do show running-config | do sh run
 ```
 
-
-
+<br>
+<br>
+<br>
 
 # Additional Commands
 
