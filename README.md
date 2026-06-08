@@ -91,11 +91,21 @@ The following section corresponds to the global configuration for any network de
     |-------|-------|
     | <pre><code>crypto key generate rsa <br>yes<br>&lt;516 / 1024 / 2048&gt;</code></pre> | <pre><code>crypto key generate rsa mod &lt;516 / 1024 / 2048&gt;</code></pre> |
 
+12. Establishment of a mistaken access trial limit
+
+    In order to increase the security of the network devices, establish a limit of error when logging into the system and applying an automatic delay to gain access for the next trial is a good alternative.
+
+    Here the number of trials and the time given between those trials as well as the waiting time can be configured.
+
+    ```
+    login  block-for <seconds_block> attemps <attemps_number_mistaken> within <seconds_mistakes>
+    ```
+
 <br>
 
-## 12. Console Access Control
+## 13. Console Access Control
 
-  12.1 Access to the line console configuration.
+  13.1 Access to the line console configuration.
 
   The number 0 refers to the port of the network device responsible for the console management. Generally there are two ports 0 and 1 although only one of them can be configured and active at a time.
 
@@ -103,13 +113,13 @@ The following section corresponds to the global configuration for any network de
   line console 0
   ```
 
-  12.2 Establish an execution time after which the console will logout.
+  13.2 Establish an execution time after which the console will logout.
 
   ```
   exec-timeout <number of minutes>
   ```
 
-  12.3 Configuring access to the line console.
+  13.3 Configuring access to the line console.
 
   There are two alternatives:
   - Configure local access based on the users database.
@@ -120,7 +130,7 @@ The following section corresponds to the global configuration for any network de
   | <pre><code> login local </code></pre> | <pre><code> password &lt;password&gt; <br> login </code></pre> | <pre><code> secret &lt;password&gt; <br> login </code></pre> |
 
 
-  12.4 Login into the system.
+  13.4 Login into the system.
 
   This command allows to hold the console messages after a process is completed instead of interrumpting it inmediately.
 
@@ -140,9 +150,9 @@ line console 0
 ```
 <br>
 
-## 13. Virtual Console Configuration for Remote Access
+## 14. Virtual Console Configuration for Remote Access
 
-  13.1 Access the remote console configuration with number of available connections. Numbers are quantity between two given numbers starting in 0.
+  14.1 Access the remote console configuration with number of available connections. Numbers are quantity between two given numbers starting in 0.
 
   E. 0 5 = 6 connections, 0 1 = 2 connections.
 
@@ -152,13 +162,13 @@ line console 0
   line vty 0 2
   ```
 
-  13.2 Establish an execution time after which the console will logout.
+  14.2 Establish an execution time after which the console will logout.
 
   ```
   exec-timeout <number of minutes>
   ```
 
-  13.3 Configuring transport method for remote access.
+  14.3 Configuring transport method for remote access.
 
   The default transport method is <code>telnet</code>; however, this protocol is very insecure as it ahs no inscription and is easily detectable. Instead it is passed to the <code>ssh</code> (Secure SHell) which requires the encryption previously declared with crypto key.
 
@@ -166,7 +176,7 @@ line console 0
   transport input ssh
   ```
 
-  13.4 Configuring access to the line console.
+  14.4 Configuring access to the line console.
 
   There are two alternatives:
   - Configure local access based on the users database.
@@ -177,7 +187,7 @@ line console 0
   | <pre><code> login local </code></pre> | <pre><code> password &lt;password&gt; <br> login </code></pre> | <pre><code> secret &lt;password&gt; <br> login </code></pre> |
 
 
-  13.5 Login into the system.
+  14.5 Login into the system.
 
   This command allows to hold the console messages after a process is completed instead of interrumpting it inmediately.
 
@@ -197,7 +207,7 @@ line vty 0 2
 ---
 <br>
 
-14. Activate password encryption in the device
+15. Activate password encryption in the device
 
 ```
 service password-encryption 
@@ -253,6 +263,8 @@ crypto key generate rsa
 yes
 1024
 
+login  block-for <seconds_block> attemps <attemps_number_mistaken> within <seconds_mistakes>
+
 line console 0
   login local
   exec-timeout 2
@@ -303,6 +315,8 @@ interface <serial_port_name as S0/0/0>
 
 ```
 <br>
+
+The clock rate can also be configured in physical interfaces other than Serial that are DCE of a Device Communication arrange.
 
 ### Subinterfaces Configuration
 
@@ -388,11 +402,21 @@ However, not always all these steps are used in all switches as some shurtcuts m
 
 ### Only Switch (All Steps)
 
+1. Creation of the VLAN database.
+
 ```
 vlan <VID>
     name <name>
     exit
 ```
+
+Repeat the previous process for as many VLANs as used in the Switch. 
+
+Once all the used VLANs are declared, then the second step is good to go.
+
+2. Assign ports to the VLANs used in the given switch.
+
+Per each range of interfaces or individual interface in case they are not consecutive declare their switchport mode as <code>access</code> and assign it to a specific VLAN in order to work.
 
 ```
 interface range <start_port>/<start>-<end>
@@ -402,12 +426,24 @@ interface range <start_port>/<start>-<end>
     
 ```
 
+3. Assign ports in TRUNK mode.
+
 ```
 interface range <start_port>/<start>-<end>
     description <description>
     switchport mode trunk
     no shutdown
 ```
+
+After declaring all ports in both modes (access and trunk) it is recommended to shutdown all remaining ports so they are not used or exploided without the administrator concent.
+
+```
+interface range <start_port>/<start>-<end>
+    shutdown
+```
+4. Assign the Native VLAN and respective switch gateway.
+
+Generally the VLAN of the switch is declared as the Native or Administrative VLAN, which has a concrete IP address to be assigned. The default gateway is the IP Address assigned to the subinterface of the same VLAN it was assigned to.
 
 ```
 int vlan <native_VID>
@@ -423,10 +459,121 @@ ip default-gateway <IP_gateway_subinterface>
 
 ### Central Switch | Core Switch
 
+Generally a central or core switch does not have any terminal devices connected to it. Instead, all its ports are TRUNK as it is the responsible for redistributing the network traffic from all the available switches connected to it to the router, which regulates and segments traffic between VLANs and to the exterior through the Internet Service Providers.
+
+As the main characteristics of this equipment:
+- All its ports are trunk
+- Can contain all the VLANs database and transmit it to all the switches it is connected to through the VTP protocol which allows to only write the VLANs once and this will be passed to others as long as the VTP protocol is configured between both.
+
+0. Configure VTP protocol as server
+
+For this section you will have to define a domain and a password that will be repeated when declaring the access to such protocol in the other devices.
+
+```
+vtp domain <domain>
+vtp mode server 
+vtp password <password>
+```
+
+1. Creation of the VLAN database.
+
+```
+vlan <VID>
+    name <name>
+    exit
+```
+
+Repeat the previous process for all the VLANs of the network. 
+
+As all ports of the switch are TRUNK we will skip over step 2.
+
+3. Assign (all) ports in TRUNK mode.
+
+```
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode trunk
+    no shutdown
+```
+
+4. Assign the Native VLAN and respective switch gateway.
+
+Generally the VLAN of the switch is declared as the Native or Administrative VLAN, which has a concrete IP address to be assigned. The default gateway is the IP Address assigned to the subinterface of the same VLAN it was assigned to.
+
+```
+int vlan <native_VID>
+    description <description>
+    ip address <IP> <MSK>
+    no shutdown
+
+ip default-gateway <IP_gateway_subinterface>
+
+```
+
+
+
 <br>
 
 ### Secondary Switch 
 
+Finally, a secondary switch is that which is connected to terminal equipments and distributes its VLANs through different ports series. As the VTP domain will be activated, there is no need for VLAN declaration here.
+
+0. Configure VTP protocol as client
+
+```
+vtp domain <domain>
+vtp mode client 
+vtp password <password>
+```
+
+It is very important the same domain and password are being used. If there are other TRUNK ports assigned to this device, it will transmit the VTP protocol if more switches are connected to it.
+
+2. Assign ports to the VLANs used in the given switch.
+
+Per each range of interfaces or individual interface in case they are not consecutive declare their switchport mode as <code>access</code> and assign it to a specific VLAN in order to work.
+
+```
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+    
+```
+
+3. Assign ports in TRUNK mode.
+
+```
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode trunk
+    no shutdown
+```
+
+After declaring all ports in both modes (access and trunk) it is recommended to shutdown all remaining ports so they are not used or exploided without the administrator concent.
+
+```
+interface range <start_port>/<start>-<end>
+    shutdown
+```
+4. Assign the Native VLAN and respective switch gateway.
+
+Generally the VLAN of the switch is declared as the Native or Administrative VLAN, which has a concrete IP address to be assigned. The default gateway is the IP Address assigned to the subinterface of the same VLAN it was assigned to.
+
+```
+int vlan <native_VID>
+    description <description>
+    ip address <IP> <MSK>
+    no shutdown
+
+ip default-gateway <IP_gateway_subinterface>
+
+```
+
+<br>
+
+This marks the end of the Switch Configuration section.
+
+For the examples of switches with their global configuration, check the within the folder <code>switches</code>.
 
 <br>
 <br>
