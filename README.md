@@ -587,6 +587,18 @@ For the examples of switches with their global configuration, check the within t
 do show running-config | do sh run
 ```
 
+2. Show the interfaces ip address and their state (UP | DOWN)
+
+```
+do show ip interface brief | do sh ip int brief
+```
+
+3. Show active vlans and ports in the switch
+
+```
+do show vlan brief
+```
+
 <br>
 <br>
 <br>
@@ -598,3 +610,19 @@ do show running-config | do sh run
 ```
 copy running-config startup-config
 ```
+
+2. Delete VLANs data from a switch in order to reload it.
+
+```
+delete vlan.dat
+```
+
+Repeat the same command twice until it gives an error that is not sure which is that file.
+
+3. Reload a switch
+
+```
+reload
+```
+
+Confirm in both bases and do not give or save any configuration.
