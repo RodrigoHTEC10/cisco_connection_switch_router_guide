@@ -1,0 +1,75 @@
+!====================== Physical Interfaces =====================
+
+interface <serial_port_name as S0/0/0>
+    description <description>
+    clock rate <64000 | 128000 | 256000 | 512000 | 2000000>
+    ip address <IP> <MSK>
+    no shutdown
+
+
+interface <port_name as G0/1>
+    description <description>
+    ip address <IP> <MSK>
+    no shutdown
+
+
+interface <port_name as G0/1>
+    description <description>
+    ip address <IP> <MSK>
+    no shutdown
+
+!=============== Subinterfaces Configuration ===============
+
+
+interface <physical_port>.<VID>
+    description <Description>
+    encapsulation dot1q <VID>
+    ip address <IP> <MSK>
+
+interface <physical_port>.<VID>
+    description <Description>
+    encapsulation dot1q <VID>
+    ip address <IP> <MSK>
+
+interface <physical_port>.<VID>
+    description <Description>
+    encapsulation dot1q <VID>
+    ip address <IP> <MSK>
+
+interface <physical_port>
+    no shutdown
+
+
+!========================= End Interfaces =========================
+
+!====================== Service Configuration =====================
+
+!========================= DHCP Configuration =====================
+
+
+ip dhcp excluded-address <first_ip | Start of an IP range> <End of an IP range>
+
+ip dhcp pool <pool_name>
+    network <IP_network> <MSK>
+    default-router <IP_default_gateway_subinterface>
+    dns-server  <IP_dns_server>
+
+ip dhcp excluded-address <first_ip | Start of an IP range> <End of an IP range>
+
+ip dhcp pool <pool_name>
+    network <IP_network> <MSK>
+    default-router <IP_default_gateway_subinterface>
+    dns-server  <IP_dns_server>
+
+ip dhcp excluded-address <first_ip | Start of an IP range> <End of an IP range>
+
+ip dhcp pool <pool_name>
+    network <IP_network> <MSK>
+    default-router <IP_default_gateway_subinterface>
+    dns-server  <IP_dns_server>
+
+!==================== Default Router Configuration ===============
+
+ip route 0.0.0.0  0.0.0.0  <physical interface>
+
+!====================== End Service Configuration =================

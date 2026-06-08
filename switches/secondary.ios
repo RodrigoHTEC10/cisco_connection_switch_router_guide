@@ -1,0 +1,101 @@
+!==================== VLANs Configuration =======================
+
+!1. Database config
+
+vlan <VID>
+    name <name>
+    exit
+
+vlan <VID>
+    name <name>
+    exit
+
+vlan <VID>
+    name <name>
+    exit
+
+!2. Assign ports to the VLANs used in the given switch.
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+
+
+!3. Assign ports in TRUNK mode.
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode trunk
+    no shutdown
+
+!4. Assign the Native VLAN and respective switch gateway.
+
+int vlan <native_VID>
+    description <description>
+    ip address <IP> <MSK>
+    no shutdown
+
+ip default-gateway <IP_gateway_subinterface>
+
+
+!================= End VLANs Configuration ======================
+!==================== VLANs Configuration =======================
+
+!0. Configure VTP
+
+vtp domain <domain>
+vtp mode client 
+vtp password <password>
+
+
+!2. Assign ports to the VLANs used in the given switch.
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode access
+    switchport access vlan <VID>
+
+
+!3. Assign ports in TRUNK mode.
+
+interface range <start_port>/<start>-<end>
+    description <description>
+    switchport mode trunk
+    no shutdown
+
+!4. Assign the Native VLAN and respective switch gateway.
+
+int vlan <native_VID>
+    description <description>
+    ip address <IP> <MSK>
+    no shutdown
+
+ip default-gateway <IP_gateway_subinterface>
+
+
+!================= End VLANs Configuration ======================

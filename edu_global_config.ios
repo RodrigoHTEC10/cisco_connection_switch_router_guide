@@ -1,0 +1,55 @@
+!================= Router Configuration ===============
+!=============== <Organization's Name> ================
+!Author: <Name>
+!Date: <Date>
+!Objective: <Objective>
+!======================================================
+
+!================ Configuración General =====================
+enable
+
+clock set HH:MM:SS <Month. E. Jun> <Day> <Year>
+
+configure terminal
+
+hostname <Device_Name>
+
+no ip domain lookup
+
+enable secret <password>
+
+banner motd #
+
+|====== UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED ======|
+|==============================================================|
+|  Please contact the system administrator for any concerns.   |
+|  Administrator. Rodrigo Hurtado                              |
+|                                                              |
+|  For more configurations, contant me at                      |
+|  hurtadorodrigo.dev@gmail.com                                |
+|==============================================================|
+
+#
+
+ip domain name <domain_name E. tec.com.mx>
+
+crypto key generate rsa
+yes
+1024
+
+login  block-for <seconds_block> attemps <attemps_number_mistaken> within <seconds_mistakes>
+
+line console 0
+    secret <password>
+    login
+    exec-timeout 2
+    logging synchronous
+
+line vty 0 4
+    secret <password>
+    exec-timeout 2
+    transport input ssh
+    login
+    logging synchronouss
+
+service password-encryption 
